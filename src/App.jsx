@@ -15,6 +15,11 @@ function App() {
   return (
     <div className="text-white bg-gray-900 h-screen flex items-center justify-center">
       Lootr connected 🔥
+      <Routes>
+        <Route path="/" element={<h1 className="p-4">Home (Lootr)</h1>} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Routes>
     </div>
   );
 }
