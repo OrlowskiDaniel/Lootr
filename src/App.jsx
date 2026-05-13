@@ -1,5 +1,8 @@
 import { useEffect } from "react";
 import { supabase } from "./lib/supabaseClient";
+import { Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 function App() {
 
