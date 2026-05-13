@@ -3,6 +3,7 @@ import { supabase } from "./lib/supabaseClient";
 import { Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Home from "./pages/Home";
 
 function App() {
 
@@ -19,7 +20,7 @@ function App() {
     <div className="text-white bg-gray-900 h-screen flex items-center justify-center">
       Lootr connected 🔥
       <Routes>
-        <Route path="/" element={<h1 className="p-4">Home (Lootr)</h1>} />
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>
