@@ -2,30 +2,26 @@ import { supabase } from "../lib/supabaseClient";
 
 // SIGN UP
 export async function signUp(email, password) {
-    const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-    });
-    if (error) {
-        console.error("Error signing up:", error.message);
-    }
+
+  // We remove the hardcoded 'mode' check so it's a pure reusable action
+  const { data, error } = await supabase.auth.signUp({ email, password });
+  if (error) throw error;
+  return data;
+
 }
 
 // SIGN IN
 export async function signIn(email, password) {
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-    });
-    if (error) {
-        console.error("Error signing in:", error.message);
-    }
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+  return data;
+
 }
 
 // SIGN OUT
 export async function signOut() {
-    const { error } = await supabase.auth.signOut(); 
-    if (error) {
-        console.error("Error signing out:", error.message);
-    }
+
+  const { error } = await supabase.auth.signOut();
+  if (error) throw error;
+
 }
