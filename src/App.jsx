@@ -1,19 +1,17 @@
-
 import { useEffect } from "react";
 import { supabase } from "./lib/supabaseClient";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, BrowserRouter, Navigate } from "react-router-dom"; 
 import MainLayout from './components/MainLayout'
 import AuthPage from './pages/AuthPage'
 import HomePage from './pages/HomePage'
-import { useSession } from './hooks/useSession'
 
+// 1. IMPORT YOUR AUTH PROVIDER HERE
+// (Double-check the path to where your AuthProvider is exported)
+import { AuthProvider } from './hooks/useAuth' 
 
 export default function App() {
-  const { session, loading } = useSession()
-
-
   return (
-
+    // 2. WRAP EVERYTHING INSIDE THE PROVIDER
     <AuthProvider>
       <BrowserRouter>
         <Routes>
