@@ -61,7 +61,7 @@ export default function AuthPage() {
 
       <div className="w-full max-w-sm relative z-10">
         {/* Logo */}
-        if (session) return <div>{session?.email}</div>
+       
         <img src="Lootr-logo.png" alt="Lootr Logo" className="" />
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-3">
