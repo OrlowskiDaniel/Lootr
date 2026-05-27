@@ -2,8 +2,6 @@
 import { useEffect } from "react";
 import { supabase } from "./lib/supabaseClient";
 import { Routes, Route } from "react-router-dom";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
 import MainLayout from './components/MainLayout'
 import AuthPage from './pages/AuthPage'
 import HomePage from './pages/HomePage'
