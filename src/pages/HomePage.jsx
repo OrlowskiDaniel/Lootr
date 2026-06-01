@@ -31,6 +31,44 @@ export default function HomePage() {
   }
 
 
+  const fetchPosts = async () => {
+    const {data, error} = await supabase
+    .from(".posts")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+    if (!error) setposts(data); 
+
+    useEffect(() => {
+      fetchPosts();
+    })
+
+    const handlesubmit = async (e) => {
+      e.preventDefault();
+
+      const error = await supabase.from("posts").insert({
+        session_id: session.sub,
+        content: content,
+      });
+
+      if (!error) setcontent("");
+
+      fetchPosts();
+    }
+    
+      {post.map ((post) => (
+        <PostCard 
+        key={post.id} 
+        user={post.user_id}
+        content={post.content}
+        date={post.created_at}
+          />
+      )) 
+      }
+      }
+
+
+
   return (
     <>
       {/* Sticky header */}

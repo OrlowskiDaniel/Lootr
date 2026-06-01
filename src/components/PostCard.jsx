@@ -13,6 +13,13 @@ export default function PostCard({ post, onLike }) {
   const { user } = post
 
 
+
+
+
+
+
+
+
   return (
     <article
       className="border-b px-4 py-4"
@@ -101,6 +108,10 @@ export default function PostCard({ post, onLike }) {
 
         </div>
       </div>
+
+
+    
+
     </article>
   )
 }
