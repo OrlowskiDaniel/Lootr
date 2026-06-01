@@ -15,7 +15,8 @@ const NAV_ITEMS = [
   { to: '/bookmarks',icon: Bookmark,  label: 'Saved' },
   { to: '/profile',  icon: User,      label: 'Profile' },
   { to: '/settings', icon: Settings,  label: 'Settings' },
-  { to: '/auth',     icon: LogOut,    label: 'Logout/Login' },
+  { to: '/auth',     icon: LogOut,    label: 'logout'},
+  
 ]
 
 export default function Sidebar() {
