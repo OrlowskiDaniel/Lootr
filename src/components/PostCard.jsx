@@ -1,24 +1,19 @@
+import React from 'react'
 import { Link } from 'react-router-dom'
 import { Heart } from 'lucide-react'
 
-// function timeAgo(dateString) {
-//   const diff = (Date.now() - new Date(dateString)) / 1000
-//   if (diff < 60) return `${Math.floor(diff)}s`
-//   if (diff < 3600) return `${Math.floor(diff / 60)}m`
-//   if (diff < 86400) return `${Math.floor(diff / 3600)}h`
-//   return `${Math.floor(diff / 86400)}d`
-// }
+function timeAgo(dateString) {
+  const diff = (Date.now() - new Date(dateString)) / 1000
+  if (diff < 60) return `${Math.floor(diff)}s`
+  if (diff < 3600) return `${Math.floor(diff / 60)}m`
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h`
+  return `${Math.floor(diff / 86400)}d`
+}
 
 export default function PostCard({ post, onLike }) {
+  if (!post || !post.user) return null
+
   const { user } = post
-
-
-
-
-
-
-
-
 
   return (
     <article
@@ -44,7 +39,7 @@ export default function PostCard({ post, onLike }) {
                 className="font-heading font-bold text-lg"
                 style={{ color: 'var(--light-purple)' }}
               >
-                {user.username[0].toUpperCase()}
+                {user.username?.[0]?.toUpperCase() ?? '?'}
               </span>
             )}
           </div>
@@ -59,7 +54,7 @@ export default function PostCard({ post, onLike }) {
               className="font-heading font-bold"
               style={{ color: 'var(--white)' }}
             >
-              {user.display_name || user.username}
+              {user.username}
             </Link>
 
             <span
@@ -75,7 +70,7 @@ export default function PostCard({ post, onLike }) {
               className="font-mono text-xs"
               style={{ color: 'var(--text-muted)' }}
             >
-              {/* {timeAgo(post.created_at)} */}
+              {timeAgo(post.created_at)}
             </span>
           </div>
 
@@ -93,9 +88,7 @@ export default function PostCard({ post, onLike }) {
               onClick={() => onLike?.(post.id)}
               className="flex items-center gap-2 text-xs"
               style={{
-                color: post.liked_by_user
-                  ? '#ec4899'
-                  : 'var(--text-muted)',
+                color: post.liked_by_user ? '#ec4899' : 'var(--text-muted)',
               }}
             >
               <Heart
@@ -108,10 +101,6 @@ export default function PostCard({ post, onLike }) {
 
         </div>
       </div>
-
-
-    
-
     </article>
   )
 }

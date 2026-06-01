@@ -1,13 +1,22 @@
 import { supabase } from "../lib/supabaseClient";
 
 // SIGN UP
-export async function signUp(email, password) {
-
-  // We remove the hardcoded 'mode' check so it's a pure reusable action
+export async function signUp(email, password, username) {
   const { data, error } = await supabase.auth.signUp({ email, password });
   if (error) throw error;
-  return data;
 
+  // Maak profiel aan
+  const { error: profileError } = await supabase
+    .from('profiles')
+    .insert([{
+      id: data.user.id,
+      user_id: data.user.id,
+      username: username || email.split('@')[0], // gebruikersnaam of deel van email
+    }])
+
+  if (profileError) throw profileError;
+
+  return data;
 }
 
 // SIGN IN
@@ -15,13 +24,10 @@ export async function signIn(email, password) {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) throw error;
   return data;
-
 }
 
 // SIGN OUT
 export async function signOut() {
-
   const { error } = await supabase.auth.signOut();
   if (error) throw error;
-
 }
