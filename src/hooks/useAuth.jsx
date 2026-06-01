@@ -1,44 +1,49 @@
 import { useState, useEffect, createContext, useContext } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
-// ─── Context ────────────────────────────────────────────────────────────────
 const AuthContext = createContext(null)
 
-// ─── Provider ───────────────────────────────────────────────────────────────
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
-  const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // TODO: Get initial session from Supabase
-    // supabase.auth.getSession().then(({ data: { session } }) => { ... })
+    // Get current session
+    supabase.auth.getSession().then(({ data }) => {
+      setUser(data.session?.user ?? null)
+      setLoading(false)
+    })
 
-    // TODO: Listen for auth state changes
-    // const { data: { subscription } } = supabase.auth.onAuthStateChange(...)
+    // Listen for changes (login/logout)
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
 
-    // Placeholder user for UI development
-    setUser({ id: '1', username: 'GamerPro', avatar_url: null })
-    setLoading(false)
+    return () => {
+      listener.subscription.unsubscribe()
+    }
   }, [])
 
-  const value = {
-    user,
-    session,
-    loading,
-    // TODO: implement these with Supabase Auth
-    signIn: async (email, password) => {},
-    signUp: async (email, password, username) => {},
-    signOut: async () => {},
-    signInWithDiscord: async () => {},
-  }
+  const signIn = (email, password) =>
+    supabase.auth.signInWithPassword({ email, password })
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  const signUp = (email, password) =>
+    supabase.auth.signUp({ email, password })
+
+  const signOut = () =>
+    supabase.auth.signOut()
+
+  return (
+    <AuthContext.Provider
+      value={{ user, loading, signIn, signUp, signOut }}
+    >
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
-// ─── Hook ────────────────────────────────────────────────────────────────────
 export function useAuth() {
   const context = useContext(AuthContext)
-  if (!context) throw new Error('useAuth must be used within an AuthProvider')
+  if (!context) throw new Error('useAuth must be used within AuthProvider')
   return context
 }

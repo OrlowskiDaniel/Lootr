@@ -1,8 +1,6 @@
 const TABS = [
   { id: 'for-you', label: 'For You' },
   { id: 'following', label: 'Following' },
-  { id: 'esports', label: 'Esports' },
-  { id: 'drops', label: 'Drops 🎁' },
 ]
 
 export default function FeedTabs({ active, onChange }) {
