@@ -30,6 +30,8 @@ export default function AuthPage() {
         
         // Note: If you want to store the custom 'username' (Gamertag), 
         // you would usually update a public profiles table in Supabase here.
+        setForm({ email: '', password: '', username: '' })
+
         
         setMessage('Account created!')
       }

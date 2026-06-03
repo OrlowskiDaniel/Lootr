@@ -4,6 +4,7 @@ import {
   Gamepad2, Trophy, Swords, Zap, Plus, LogOut,
 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
+import { signOut } from '../api/auth'
 
 const NAV_ITEMS = [
   { to: '/',         icon: Home,      label: 'Home' },
