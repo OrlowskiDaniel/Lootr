@@ -33,8 +33,8 @@ export default function ComposePost({ onPost }) {
   }
 
   return (
-    <div className="border-b px-4 py-4" style={{ borderColor: 'var(--border)' }}>
-      <div className="flex gap-3">
+    <div className="border-b !px-4 !py-4" style={{ borderColor: 'var(--border)' }}>
+      <div className="flex !gap-3">
         
         {/* Avatar */}
         <div
@@ -48,12 +48,7 @@ export default function ComposePost({ onPost }) {
               className="w-full h-full rounded-full object-cover"
             />
           ) : (
-            <span
-              className="font-heading font-bold text-lg"
-              style={{ color: 'var(--light-purple)' }}
-            >
-              {user?.username?.[0]?.toUpperCase() ?? 'G'}
-            </span>
+            <img src="/default-avatar.png" alt="default avatar" className="w-full h-full rounded-full object-cover" />
           )}
         </div>
 
@@ -74,7 +69,7 @@ export default function ComposePost({ onPost }) {
             }}
           />
 
-          <div className="neon-line my-3" />
+          <div className="neon-line !my-3" />
 
           <div className="flex items-center justify-between">
             
@@ -96,7 +91,7 @@ export default function ComposePost({ onPost }) {
             <button
               onClick={handlePost}
               disabled={isEmpty || loading}
-              className="btn-primary flex items-center gap-2 px-5 py-2 rounded-full text-sm disabled:opacity-40"
+              className="btn-primary flex items-center !gap-2 !px-5 !py-2 rounded-full text-sm disabled:opacity-40"
             >
               {loading ? (
                 'Posting...'

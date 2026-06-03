@@ -66,7 +66,7 @@ export default function AuthPage() {
        
         <img src="Lootr-logo.png" alt="Lootr Logo" className="" />
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-3">
+          <div className="flex items-center justify-center !gap-3 !mb-3">
             <div className="relative">
               <Gamepad2 size={40} style={{ color: 'var(--light-purple)' }} />
               <div className="absolute inset-0 blur-lg opacity-60"

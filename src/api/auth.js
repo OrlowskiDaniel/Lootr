@@ -11,7 +11,8 @@ export async function signUp(email, password, username) {
     .insert([{
       id: data.user.id,
       user_id: data.user.id,
-      username: username || email.split('@')[0], // gebruikersnaam of deel van email
+      username: username,
+      avatar_url: '/default-avatar.png'
     }])
 
   if (profileError) throw profileError;

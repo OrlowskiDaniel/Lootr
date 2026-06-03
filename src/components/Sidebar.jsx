@@ -31,7 +31,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="px-6 py-5 border-b" style={{ borderColor: 'var(--border)' }}>
 				<img src="Lootr-logo.png" alt="Lootr Logo" className="" />
-        <NavLink to="/" className="flex items-center gap-2 group">
+        <NavLink to="/" className="flex items-center !gap-2 group">
 					
           <div className="relative">
             <Gamepad2 size={28} style={{ color: 'var(--light-purple)' }}
@@ -47,14 +47,14 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 !px-3 !py-4 space-y-1 overflow-y-auto">
         {NAV_ITEMS.map(({ to, icon: Icon, label, badge }) => (
           <NavLink
             key={to}
             to={to}
             end={to === '/'}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group relative
+              `flex items-center !gap-3 !px-3 !py-2.5 rounded-lg transition-all duration-200 group relative
               ${isActive
                 ? 'nav-active'
                 : 'hover:bg-opacity-10'}`
@@ -86,10 +86,10 @@ export default function Sidebar() {
       </nav>
 
       {/* Post Button */}
-      <div className="px-4 py-3 border-t" style={{ borderColor: 'var(--border)' }}>
+      <div className="!px-4 !py-3 border-t" style={{ borderColor: 'var(--border)' }}>
         <button
           onClick={() => navigate('/')}
-          className="btn-primary w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg cursor-pointer"
+          className="btn-primary w-full flex items-center justify-center !gap-2 !py-2.5 !px-4 rounded-lg cursor-pointer"
         >
           <Plus size={18} />
           <span className="font-heading font-bold tracking-widest text-sm">NEW LOOT</span>
@@ -98,23 +98,21 @@ export default function Sidebar() {
 
       {/* User profile strip */}
       {user && (
-        <div className="px-4 py-3 border-t flex items-center gap-3 group cursor-pointer hover:bg-opacity-5"
+        <div className="!px-4 !py-3 border-t flex items-center !gap-3 group cursor-pointer hover:bg-opacity-5"
           style={{ borderColor: 'var(--border)', background: 'rgba(123,47,190,0.05)' }}>
           <div className="avatar-ring w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
             style={{ background: 'var(--dark-purple)' }}>
             {user.avatar_url
               ? <img src={user.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
-              : <span className="font-heading font-bold text-sm" style={{ color: 'var(--light-purple)' }}>
-                  {user.username?.[0]?.toUpperCase()}
-                </span>
+              : <img src="/default-avatar.png" alt="default avatar" className="w-full h-full rounded-full object-cover" />
             }
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-heading font-semibold text-sm truncate" style={{ color: 'var(--white)' }}>
-              {user.display_name || user.username}
+              {user.username}
             </p>
             <p className="font-mono text-xs truncate" style={{ color: 'var(--text-muted)' }}>
-              @{user.username}
+              {user.username}
             </p>
           </div>
           <button onClick={signOut} className="p-1.5 rounded hover:opacity-80 transition-opacity"

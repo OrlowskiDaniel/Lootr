@@ -33,7 +33,7 @@ export default function HomePage() {
           .from('profiles')
           .select('user_id, username, avatar_url')
           .eq('user_id', post.user_id)
-          .single()
+          .maybeSingle()
 
         return { ...post, user: userData }
       })
