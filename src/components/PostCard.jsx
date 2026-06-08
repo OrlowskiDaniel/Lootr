@@ -1,6 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Heart } from 'lucide-react'
+import { supabase } from '../lib/supabaseClient'
+
 
 function timeAgo(dateString) {
   const diff = (Date.now() - new Date(dateString)) / 1000
@@ -10,10 +12,20 @@ function timeAgo(dateString) {
   return `${Math.floor(diff / 86400)}d`
 }
 
-export default function PostCard({ post, onLike }) {
+export default function PostCard({ post, onLike, onDelete }) {
   if (!post || !post.user) return null
 
   const { user } = post
+  const [currentUser, setCurrentUser] = React.useState(null)
+
+  React.useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setCurrentUser(data.user))
+  }, [])
+
+  const handledelete = async (id) => {
+    const { error } = await supabase.from('posts').delete().eq('id', id)
+    if (!error) onDelete?.()
+  }
 
   return (
     <article
@@ -97,10 +109,20 @@ export default function PostCard({ post, onLike }) {
               />
               {post.likes_count ?? 0}
             </button>
+
+            {currentUser?.id === post.user_id && (
+              <button
+                onClick={() => handledelete(post.id)}
+              >
+                Delete
+              </button>
+            )}
+
           </div>
 
         </div>
       </div>
+      
     </article>
   )
 }

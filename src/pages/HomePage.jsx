@@ -65,6 +65,16 @@ export default function HomePage() {
     console.log('liked:', postId)
   }
 
+
+const deletePost = async (postId) => {
+  const { error } = await supabase.from('posts').delete().eq('id', postId);
+  if (error) {
+    console.error('Error deleting:', error.message);
+  } else {
+    fetchPosts(); 
+  }
+};
+
   return (
     <>
       {/* Sticky header */}
@@ -101,13 +111,15 @@ export default function HomePage() {
         />
       ) : (
         <div>
-          {posts.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              onLike={likePost}
-            />
-          ))}
+{posts.map((post) => (
+  <PostCard
+    key={post.id}
+    post={post}
+    onLike={likePost}
+    // Vergelijk met de ingelogde gebruiker (user.id)
+    onDelete={post.user_id === user?.id ? () => deletePost(post.id) : undefined}
+  />
+))}
         </div>
       )}
     </>
