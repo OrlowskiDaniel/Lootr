@@ -15,6 +15,7 @@ function timeAgo(dateString) {
 export default function PostCard({ post, onLike, onDelete }) {
   if (!post || !post.user) return null
 
+  
   const { user } = post
   const [currentUser, setCurrentUser] = React.useState(null)
 
@@ -121,7 +122,8 @@ export default function PostCard({ post, onLike, onDelete }) {
           </div>
 
         </div>
-      </div>
+      </div> 
+      
       
     </article>
   )
