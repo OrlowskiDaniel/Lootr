@@ -5,7 +5,9 @@ import EditProfileModal from '../components/EditProfileModal'
 import PostCard from '../components/PostCard'
 import EmptyState from '../components/EmptyState'
 import { useAuth } from '../hooks/useAuth'
-import { getProfileByUsername, getPostsByUser } from '../api/profile'
+import { getProfileByUsername, getPostsByUser, getFollowersCount } from '../api/profile'
+import { toggleFollow, checkIfFollowing } from '../api/follows'
+import { toggleLike } from '../api/likes'
 
 export default function ProfilePage() {
   const { username } = useParams()
@@ -15,19 +17,53 @@ export default function ProfilePage() {
   const [posts, setPosts] = useState([])
   const [editing, setEditing] = useState(false)
 
+  const [isFollowing, setIsFollowing] = useState(false)
+  const [followersCount, setFollowersCount] = useState(0)
+
+  const likePost = async (postId) => {
+    if (!user) return
+
+    const res = await toggleLike(postId, user.id)
+
+    setPosts(prev =>
+      prev.map(p =>
+        p.id === postId
+          ? {
+              ...p,
+              likes_count: res.liked
+                ? p.likes_count + 1
+                : p.likes_count - 1,
+              liked_by_user: res.liked
+            }
+          : p
+      )
+    )
+  }
+
   useEffect(() => {
+    if (!username) return
+
     const load = async () => {
       const profileData = await getProfileByUsername(username)
-      setProfile(profileData)
 
       if (profileData) {
+        setProfile(profileData)
+
+        const count = await getFollowersCount(profileData.user_id)
+        setFollowersCount(count)
+
+        if (user) {
+          const following = await checkIfFollowing(profileData.user_id, user.id)
+          setIsFollowing(following)
+        }
+
         const postsData = await getPostsByUser(profileData.user_id)
         setPosts(postsData)
       }
     }
 
     load()
-  }, [username])
+  }, [username, user]) 
 
   if (!profile) return <p className="p-4">Loading...</p>
 
@@ -42,6 +78,23 @@ export default function ProfilePage() {
       <div className="px-4 -mt-12">
         <div className="flex justify-between items-start">
           <Avatar user={profile} size="xl" />
+
+          {!isOwner && (
+            <button
+                className="btn-primary px-4 py-1 mt-4"
+                onClick={async () => {
+                  if (!user) return // Guard clause if user isn't logged in
+
+                  const res = await toggleFollow(profile.user_id, user.id)
+                  setIsFollowing(res.following)
+                  
+                  // Dynamically increment or decrement the UI counter
+                  setFollowersCount(prev => res.following ? prev + 1 : prev - 1)
+                }}
+            >
+                {isFollowing ? 'Unfollow' : 'Follow'}
+            </button>
+            )}
 
           {isOwner && (
             <button
@@ -64,7 +117,7 @@ export default function ProfilePage() {
         {/* stats (fake for now) */}
         <div className="flex gap-4 mt-3 text-sm">
           <span><b>{posts.length}</b> Posts</span>
-          <span><b>0</b> Followers</span>
+          <span><b>{followersCount}</b> Followers</span>
         </div>
       </div>
 
@@ -77,7 +130,11 @@ export default function ProfilePage() {
           <EmptyState title="No posts yet" />
         ) : (
           posts.map(post => (
-            <PostCard key={post.id} post={post} />
+            <PostCard 
+              key={post.id} 
+              post={post} 
+              onLike={likePost} 
+            />
           ))
         )}
       </div>

@@ -9,6 +9,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
+    storage: window.sessionStorage, // <--- Change this from localStorage
+    autoRefreshToken: true,
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,

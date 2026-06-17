@@ -22,7 +22,10 @@ export const getPostsByUser = async (userId) => {
 
   return data.map(post => ({
     ...post,
-    likes_count: (post.likes || []).length
+    likes_count: (post.likes || []).length,
+    liked_by_user: (post.likes || []).some(
+        l => l.user_id === supabase.auth.getUser()?.data?.user?.id
+    )
   }))
 }
 
@@ -35,4 +38,18 @@ export const upsertProfile = async (profile) => {
 
   if (error) throw error
   return data
+}
+
+export const getFollowersCount = async (userId) => {
+  const { count, error } = await supabase
+    .from('follows')
+    .select('id', { count: 'exact', head: true })
+    .eq('following_id', userId)
+
+  if (error) {
+    console.error("Error fetching follower count:", error)
+    return 0
+  }
+
+  return count ?? 0
 }
