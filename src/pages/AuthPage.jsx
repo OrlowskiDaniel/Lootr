@@ -1,21 +1,19 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom' // Added for routing
+import { useNavigate } from 'react-router-dom'
 import { Gamepad2, Eye, EyeOff, ArrowRight } from 'lucide-react'
-import { signIn, signUp } from '../api/auth' // Import your API functions
+import { signIn, signUp } from '../api/auth'
 
 export default function AuthPage() {
   const navigate = useNavigate()
-  const [mode, setMode] = useState('login') // 'login' | 'signup'
+  const [mode, setMode] = useState('login')
   const [showPassword, setShowPassword] = useState(false)
   const [form, setForm] = useState({ email: '', password: '', username: '' })
   const [loading, setLoading] = useState(false)
-  
-  // Local state to show user feedback
   const [error, setError] = useState(null)
   const [message, setMessage] = useState(null)
 
   const handleSubmit = async (e) => {
-    if (e) e.preventDefault() // Prevents default form submissions if wrapped later
+    if (e) e.preventDefault()
     setLoading(true)
     setError(null)
     setMessage(null)
@@ -23,20 +21,22 @@ export default function AuthPage() {
     try {
       if (mode === 'login') {
         await signIn(form.email, form.password)
-        // If login is successful, navigate to homepage
         navigate('/')
       } else {
-        await signUp(form.email, form.password)
-        
-        // Note: If you want to store the custom 'username' (Gamertag), 
-        // you would usually update a public profiles table in Supabase here.
-        setForm({ email: '', password: '', username: '' })
+        const data = await signUp(form.email, form.password, form.username)
 
-        
-        setMessage('Account created!')
+        // If email confirmation is ON, data.user exists but data.session is null.
+        // If confirmation is OFF, both exist and we can go straight to the app.
+        if (data.session) {
+          navigate('/')
+        } else {
+          // Email confirmation required — tell the user and stop the spinner
+          setForm({ email: '', password: '', username: '' })
+          setMessage('Account created! Check your email to confirm your account, then sign in.')
+        }
       }
     } catch (err) {
-      setError(err.message || 'Something went wrong during authentication.')
+      setError(err.message || 'Something went wrong.')
     } finally {
       setLoading(false)
     }
@@ -62,8 +62,6 @@ export default function AuthPage() {
       </div>
 
       <div className="w-full max-w-sm relative z-10">
-        {/* Logo */}
-       
         <img src="Lootr-logo.png" alt="Lootr Logo" className="" />
         <div className="text-center mb-8">
           <div className="flex items-center justify-center !gap-3 !mb-3">
@@ -82,13 +80,12 @@ export default function AuthPage() {
           </p>
         </div>
 
-        {/* Card */}
         <div className="lootr-card rounded-2xl !p-6 glow-border">
           {/* Mode toggle */}
           <div className="flex rounded-lg overflow-hidden border mb-6"
             style={{ borderColor: 'var(--border)' }}>
             {['login', 'signup'].map(m => (
-              <button key={m} onClick={() => { setMode(m); setError(null); setMessage(null); }}
+              <button key={m} onClick={() => { setMode(m); setError(null); setMessage(null) }}
                 className="flex-1 !py-2.5 text-sm font-bold transition-all cursor-pointer"
                 style={{
                   fontFamily: 'Rajdhani, sans-serif',
@@ -101,7 +98,6 @@ export default function AuthPage() {
             ))}
           </div>
 
-          {/* Feedback Messages */}
           {error && (
             <div className="mb-4 text-xs !p-3 rounded bg-red-500/10 border border-red-500/30 text-red-400 font-mono">
               {error}
@@ -114,7 +110,6 @@ export default function AuthPage() {
           )}
 
           <div className="space-y-4">
-            {/* Username (signup only) */}
             {mode === 'signup' && (
               <div className="!mb-4">
                 <label className="block font-heading font-semibold text-xs tracking-wider !mb-1.5"
@@ -131,8 +126,7 @@ export default function AuthPage() {
               </div>
             )}
 
-            {/* Email */}
-            <div className="!mb-4"> 
+            <div className="!mb-4">
               <label className="block font-heading font-semibold text-xs tracking-wider !mb-1.5"
                 style={{ color: 'var(--silver)' }}>
                 EMAIL
@@ -146,7 +140,6 @@ export default function AuthPage() {
               />
             </div>
 
-            {/* Password */}
             <div className='!mb-6'>
               <label className="block font-heading font-semibold text-xs tracking-wider !mb-1.5"
                 style={{ color: 'var(--silver)' }}>
@@ -170,7 +163,6 @@ export default function AuthPage() {
               </div>
             </div>
 
-            {/* Submit */}
             <button
               onClick={handleSubmit}
               disabled={loading}
@@ -188,14 +180,12 @@ export default function AuthPage() {
               )}
             </button>
 
-            {/* Divider */}
             <div className="flex items-center gap-3 !mb-5 !mt-5">
               <div className="flex-1 neon-line" />
               <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>OR</span>
               <div className="flex-1 neon-line" />
             </div>
 
-            {/* Discord OAuth */}
             <button
               type="button"
               className="btn-ghost w-full flex items-center justify-center gap-2.5 !py-3 rounded-lg cursor-pointer"

@@ -5,7 +5,7 @@ import { useAuth } from '../hooks/useAuth'
 const MAX_CHARS = 280
 
 export default function ComposePost({ onPost }) {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
   const textareaRef = useRef(null)
@@ -41,14 +41,18 @@ export default function ComposePost({ onPost }) {
           className="avatar-ring w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
           style={{ background: 'var(--dark-purple)' }}
         >
-          {user?.avatar_url ? (
+          {profile?.avatar_url ? (
             <img
-              src={user.avatar_url}
-              alt=""
+              src={profile.avatar_url}
+              alt="avatar"
               className="w-full h-full rounded-full object-cover"
             />
           ) : (
-            <img src="/default-avatar.png" alt="default avatar" className="w-full h-full rounded-full object-cover" />
+            <img
+              src="/default-avatar.png"
+              alt="default avatar"
+              className="w-full h-full rounded-full object-cover"
+            />
           )}
         </div>
 

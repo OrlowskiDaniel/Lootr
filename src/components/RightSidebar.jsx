@@ -23,7 +23,7 @@ export default function RightSidebar() {
   return (
     /* REMOVED: h-screen and overflow-y-auto */
     /* CHANGED: Kept sticky top-0 so it fixes in place naturally with the window scroll */
-    <aside className="w-full flex-shrink-0 flex flex-col !gap-8 sticky top-0 !py-6 !px-4">
+    <aside className="w-full flex-shrink-0 flex flex-col gap-8 sticky top-0 py-6 px-4 z-20">
 
       {/* Search */}
       <div className="relative">

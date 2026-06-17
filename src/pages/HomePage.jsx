@@ -15,32 +15,28 @@ export default function HomePage() {
 
   const fetchPosts = async () => {
     setLoading(true)
+    console.log('fetchPosts started')
+    try {
+      const { data: postsData, error: postsError } = await supabase
+        .from('posts')
+        .select(`*, profiles(username, avatar_url), likes(user_id)`)
+        .order('created_at', { ascending: false })
 
-    const { data: postsData, error } = await supabase
-      .from('posts')
-      .select('*')
-      .order('created_at', { ascending: false })
+      console.log('posts result:', { data: postsData, error: postsError })
 
-    if (error) {
-      console.error('Error fetching posts:', error.message)
+      if (postsError) throw postsError
+
+      const formatted = (postsData ?? []).map(post => ({
+        ...post,
+        likes_count: (post.likes || []).length,
+        liked_by_user: (post.likes || []).some(like => like.user_id === user?.id)
+      }))
+      setPosts(formatted)
+    } catch (err) {
+      console.error('fetchPosts error:', err)
+    } finally {
       setLoading(false)
-      return
     }
-
-    const postsWithUsers = await Promise.all(
-      postsData.map(async (post) => {
-        const { data: userData } = await supabase
-          .from('profiles')
-          .select('user_id, username, avatar_url')
-          .eq('user_id', post.user_id)
-          .maybeSingle()
-
-        return { ...post, user: userData }
-      })
-    )
-
-    setPosts(postsWithUsers)
-    setLoading(false)
   }
 
   useEffect(() => {
@@ -62,7 +58,33 @@ export default function HomePage() {
   }
 
   const likePost = async (postId) => {
-    console.log('liked:', postId)
+    if (!user) return
+
+    // Check if already liked
+    const { data: existingLike } = await supabase
+      .from('likes')
+      .select('*')
+      .eq('post_id', postId)
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    if (existingLike) {
+      // UNLIKE
+      await supabase
+        .from('likes')
+        .delete()
+        .eq('id', existingLike.id)
+    } else {
+      // LIKE
+      await supabase
+        .from('likes')
+        .insert({
+          post_id: postId,
+          user_id: user.id
+        })
+    }
+
+    fetchPosts()
   }
 
   return (
