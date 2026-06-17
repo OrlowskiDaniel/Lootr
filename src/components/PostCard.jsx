@@ -11,9 +11,10 @@ function timeAgo(dateString) {
 }
 
 export default function PostCard({ post, onLike }) {
-  if (!post || !post.user) return null
+  // FIX: was `!post.user` — the field is `post.profiles`, not `post.user`
+  if (!post || !post.profiles) return null
 
-  const { user } = post
+  const user = post.profiles
 
   return (
     <article
