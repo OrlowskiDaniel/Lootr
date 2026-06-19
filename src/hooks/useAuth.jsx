@@ -52,11 +52,19 @@ export function AuthProvider({ children }) {
           await new Promise(r => setTimeout(r, 400))
           let prof = await fetchProfile(sessionUser.id)
 
-          const metaUsername = sessionUser.user_metadata?.username
+          // For email signups, use their chosen username.
+          // For Google OAuth, fall back to their Google display name.
+          const metaUsername =
+            sessionUser.user_metadata?.username ||
+            sessionUser.user_metadata?.full_name?.replace(/\s+/g, '_').toLowerCase()
+
           if (metaUsername && prof && prof.username?.startsWith('user_')) {
+            const avatarUrl =
+              sessionUser.user_metadata?.avatar_url || '/default-avatar.png'
+
             const { data: updated } = await supabase
               .from('profiles')
-              .update({ username: metaUsername, avatar_url: '/default-avatar.png' })
+              .update({ username: metaUsername, avatar_url: avatarUrl })
               .eq('user_id', sessionUser.id)
               .select()
               .single()
