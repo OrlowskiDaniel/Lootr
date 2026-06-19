@@ -86,7 +86,10 @@ export default function PostCard({ post, onLike }) {
           {/* Like */}
           <div className="mt-3">
             <button
-              onClick={() => onLike?.(post.id)}
+              onClick={() => {
+                if (!onLike) return
+                onLike(post.id)
+              }}
               className="flex items-center gap-2 text-xs"
               style={{
                 color: post.liked_by_user ? '#ec4899' : 'var(--text-muted)',

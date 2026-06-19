@@ -6,6 +6,8 @@ import PostCard from '../components/PostCard'
 import EmptyState from '../components/EmptyState'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabaseClient'
+import { fetchPosts } from '../api/posts'
+import { toggleLike } from '../api/likes'
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState('for-you')
@@ -60,31 +62,45 @@ export default function HomePage() {
   const likePost = async (postId) => {
     if (!user) return
 
-    // Check if already liked
-    const { data: existingLike } = await supabase
-      .from('likes')
-      .select('*')
-      .eq('post_id', postId)
-      .eq('user_id', user.id)
-      .maybeSingle()
+    try {
+      const { data: existingLike } = await supabase
+        .from('likes')
+        .select('id')
+        .eq('post_id', postId)
+        .eq('user_id', user.id)
+        .maybeSingle()
 
-    if (existingLike) {
-      // UNLIKE
-      await supabase
-        .from('likes')
-        .delete()
-        .eq('id', existingLike.id)
-    } else {
-      // LIKE
-      await supabase
-        .from('likes')
-        .insert({
-          post_id: postId,
-          user_id: user.id
-        })
+      if (existingLike) {
+        await supabase
+          .from('likes')
+          .delete()
+          .eq('id', existingLike.id)
+      } else {
+        await supabase
+          .from('likes')
+          .insert({
+            post_id: postId,
+            user_id: user.id
+          })
+      }
+
+      // ⚡ Optimistic update (better UX)
+      setPosts(prev =>
+        prev.map(p =>
+          p.id === postId
+            ? {
+                ...p,
+                likes_count: existingLike
+                  ? p.likes_count - 1
+                  : p.likes_count + 1,
+                liked_by_user: !existingLike
+              }
+            : p
+        )
+      )
+    } catch (err) {
+      console.error(err)
     }
-
-    fetchPosts()
   }
 
   return (
