@@ -11,20 +11,33 @@ export const getProfileByUsername = async (username) => {
   return data
 }
 
-export const getPostsByUser = async (userId) => {
+export const getPostsByUser = async (userId, currentUserId) => {
   const { data, error } = await supabase
     .from('posts')
-    .select(`*, profiles(username, avatar_url), likes(user_id)`)
+    .select(`
+      *,
+      profiles(username, avatar_url),
+      likes(user_id),
+      post_tags(
+        tags(id, name, display_name)
+      )
+    `)
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
 
   if (error) throw error
 
-  return data.map(post => ({
+  return (data || []).map(post => ({
     ...post,
+
+    // attach tags
+    tags: (post.post_tags || []).map(pt => pt.tags),
+
+    // likes
     likes_count: (post.likes || []).length,
+
     liked_by_user: (post.likes || []).some(
-        l => l.user_id === supabase.auth.getUser()?.data?.user?.id
+      l => l.user_id === currentUserId
     )
   }))
 }
