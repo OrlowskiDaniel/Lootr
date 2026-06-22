@@ -1,77 +1,56 @@
 import { supabase } from '../lib/supabaseClient'
 
-// get trending tags
+/**
+ * GET TRENDING TAGS
+ * ask
+ * sorted from highest to lowest, and take the top 10
+ */
 export const getTrendingTags = async () => {
-  const { data, error } = await supabase
-    .from('post_tags')
-    .select(`
-      tag_id,
-      tags(name, display_name, category)
-    `)
+  const { data } = await supabase
+    .from('tags')
+    .select('name, display_name, category, count') 
+    .order('count', { ascending: false })          // Highest count first
+    .limit(10)                                     // stop at 10
 
-  if (error) throw error
-
-  // group manually
-  const map = {}
-
-  data.forEach(row => {
-    const tag = row.tags
-    if (!map[tag.name]) {
-      map[tag.name] = {
-        ...tag,
-        count: 0
-      }
-    }
-    map[tag.name].count++
-  })
-
-  return Object.values(map)
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 10)
+  return data || []
 }
 
-// search tags
+/**
+ * SEARCH TAGS
+ * Looks for tags where the name or display name looks like the search query.
+ */
 export const searchTags = async (query) => {
-  if (!query) return []
-
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from('tags')
     .select('*')
-    .or(`name.ilike.%${query}%,display_name.ilike.%${query}%`)
+    .or(`name.ilike.%${query}%,display_name.ilike.%${query}%`) // Simple 'either/or' search
     .limit(5)
 
-  if (error) throw error
-
-  return data
+  return data || []
 }
 
-// posts by tag
+/**
+ * GET POSTS BY TAG
+ * fetches posts that have a specific tag, along with who wrote it 
+ * and who liked it
+ */
 export const getPostsByTag = async (tagName, userId) => {
-  const { data, error } = await supabase
-    .from('post_tags')
+  const { data } = await supabase
+    .from('posts')
     .select(`
-      posts(
-        *,
-        profiles(username, avatar_url),
-        likes(user_id),
-        post_tags(
-          tags(id, name, display_name)
-        )
-      ),
-      tags!inner(name)
+      *,
+      profiles(username, avatar_url),
+      likes(user_id),
+      post_tags!inner(tags!inner(name))
     `)
-    .eq('tags.name', tagName)
+    .eq('post_tags.tags.name', tagName) // only get posts matching this tag name
 
-  if (error) throw error
-
-  return data.map(row => {
-    const post = row.posts
-
+  // clean up the data structure so it is ready for the UI
+  return (data || []).map(post => {
     return {
       ...post,
-      tags: post.post_tags.map(pt => pt.tags),
-      likes_count: (post.likes || []).length,
-      liked_by_user: (post.likes || []).some(l => l.user_id === userId)
+      likes_count: post.likes ? post.likes.length : 0,
+      liked_by_user: post.likes ? post.likes.some(like => like.user_id === userId) : false
     }
   })
 }
