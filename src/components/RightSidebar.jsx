@@ -1,14 +1,8 @@
 import { useState } from 'react'    
 import { Search, TrendingUp, Zap } from 'lucide-react'
-
-const TRENDING = [
-  { tag: 'Valorant', posts: '42.1K', category: 'Esports' },
-  { tag: 'EldenRing', posts: '28.7K', category: 'RPG' },
-  { tag: 'Minecraft', posts: '21.4K', category: 'Sandbox' },
-  { tag: 'CallOfDuty', posts: '19.2K', category: 'FPS' },
-  { tag: 'LeagueOfLegends', posts: '17.8K', category: 'MOBA' },
-  { tag: 'Fortnite', posts: '15.3K', category: 'Battle Royale' },
-]
+import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { getTrendingTags, searchTags } from '../api/tags'
 
 const SUGGESTIONS = [
   { username: 'NinjaStream', display_name: 'Ninja', followers: '24.2M', verified: true },
@@ -19,11 +13,38 @@ const SUGGESTIONS = [
 
 export default function RightSidebar() {
   const [search, setSearch] = useState('')
+  const [trending, setTrending] = useState([])
+  const [results, setResults] = useState([])
+  const navigate = useNavigate()
+
+  // Fetch trending
+  useEffect(() => {
+    const load = async () => {
+      const data = await getTrendingTags()
+      setTrending(data)
+    }
+    load()
+  }, [])
+
+  // Search logic
+  useEffect(() => {
+    const run = async () => {
+      if (!search) {
+        setResults([])
+        return
+      }
+
+      const data = await searchTags(search)
+      setResults(data)
+    }
+
+    run()
+  }, [search])
 
   return (
     /* REMOVED: h-screen and overflow-y-auto */
     /* CHANGED: Kept sticky top-0 so it fixes in place naturally with the window scroll */
-    <aside className="w-full flex-shrink-0 flex flex-col gap-8 sticky top-0 py-6 px-4 z-20">
+    <aside className="w-full flex-shrink-0 flex flex-col gap-8 sticky top-0 !py-6 !px-4 z-20">
 
       {/* Search */}
       <div className="relative">
@@ -53,31 +74,31 @@ export default function RightSidebar() {
           </h3>
         </div>
 
-        {TRENDING.map((item, i) => (
-          <div key={item.tag}
-            className="flex items-center justify-between !px-5 !py-4 cursor-pointer transition-colors"
-            style={{ borderBottom: i < TRENDING.length - 1 ? '1px solid var(--border)' : 'none' }}
-            onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+        {(search ? results : trending).map((item, i) => (
+          <div
+            key={item.name}
+            onClick={() => navigate(`/?tag=${item.name}`)}
+            className="flex items-center justify-between !px-5 !py-4 cursor-pointer border-b border-[var(--border)]"
           >
             <div>
-              <p className="trend-num text-xs opacity-80">#{i + 1} · {item.category}</p>
-              <p className="font-heading font-semibold text-sm mt-1" style={{ color: 'var(--white)' }}>
-                #{item.tag}
+              <p className="text-xs opacity-80">
+                #{i + 1} · {item.category || 'Gaming'}
               </p>
-              <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-                {item.posts} posts
+
+              <p className="font-semibold text-sm">
+                #{item.display_name || item.name}
               </p>
+
+              {!search && (
+                <p className="text-xs">
+                  {item.count} posts
+                </p>
+              )}
             </div>
-            <Zap size={16} style={{ color: 'var(--text-muted)' }} />
           </div>
         ))}
 
         <div className="!px-5 !py-4">
-          <button className="text-sm font-medium transition-colors hover:opacity-80"
-            style={{ color: 'var(--light-purple)' }}>
-            Show more
-          </button>
         </div>
       </div>
 
@@ -106,7 +127,7 @@ export default function RightSidebar() {
 
             {/* Info */}
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1">
+              <div className="flex items-center !gap-1">
                 <p className="font-heading font-semibold text-sm truncate" style={{ color: 'var(--white)' }}>
                   {person.display_name}
                 </p>
@@ -132,10 +153,6 @@ export default function RightSidebar() {
         ))}
 
         <div className="!px-5 !py-4">
-          <button className="text-sm font-medium transition-colors hover:opacity-80"
-            style={{ color: 'var(--light-purple)' }}>
-            Show more
-          </button>
         </div>
       </div>
 

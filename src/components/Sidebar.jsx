@@ -7,9 +7,6 @@ import { useAuth } from '../hooks/useAuth'
 
 const NAV_ITEMS = [
   { to: '/', icon: Home, label: 'Home' },
-  { to: '/explore', icon: Search, label: 'Explore' },
-  { to: '/battles', icon: Swords, label: 'Battles' },
-  { to: '/leaderboard', icon: Trophy, label: 'Leaderboard' },
   { to: '/notifications', icon: Bell, label: 'Alerts', badge: 3 },
   { to: '/messages', icon: Mail, label: 'Messages' },
   { to: '/bookmarks', icon: Bookmark, label: 'Saved' },
@@ -109,10 +106,10 @@ export default function Sidebar() {
       </nav>
 
       {/* Post Button */}
-      <div className="px-4 py-3 border-t" style={{ borderColor: 'var(--border)' }}>
+      <div className="!px-4 !py-3 border-t" style={{ borderColor: 'var(--border)' }}>
         <button
           onClick={() => navigate('/')}
-          className="btn-primary w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg cursor-pointer"
+          className="btn-primary w-full flex items-center justify-center !gap-2 !py-2.5 !px-4 rounded-lg cursor-pointer"
         >
           <Plus size={18} />
           <span className="font-heading font-bold tracking-widest text-sm">
@@ -122,11 +119,11 @@ export default function Sidebar() {
       </div>
 
       {/* Auth Button */}
-      <div className="px-4 py-3 border-t" style={{ borderColor: 'var(--border)' }}>
+      <div className="!px-4 !py-3 border-t" style={{ borderColor: 'var(--border)' }}>
         {user ? (
           <button
             onClick={signOut}
-            className="btn-ghost w-full flex items-center justify-center gap-2 py-2 rounded-lg"
+            className="btn-ghost w-full flex items-center justify-center !gap-2 !py-2 rounded-lg"
           >
             <LogOut size={18} />
             <span>Sign Out</span>
@@ -134,7 +131,7 @@ export default function Sidebar() {
         ) : (
           <button
             onClick={() => navigate('/auth')}
-            className="btn-primary w-full flex items-center justify-center gap-2 py-2 rounded-lg"
+            className="btn-primary w-full flex items-center justify-center !gap-2 !py-2 rounded-lg"
           >
             <span>Sign In</span>
           </button>
@@ -145,7 +142,7 @@ export default function Sidebar() {
       {user && (
         <div
           onClick={() => navigate(`/profile/${profile?.username}`)}
-          className="px-4 py-3 border-t flex items-center gap-3 group cursor-pointer hover:bg-opacity-5"
+          className="!px-4 !py-3 border-t flex items-center !gap-3 group cursor-pointer hover:bg-opacity-5"
           style={{
             borderColor: 'var(--border)',
             background: 'rgba(123,47,190,0.05)',

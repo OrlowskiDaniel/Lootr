@@ -8,34 +8,66 @@ import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabaseClient'
 import { fetchPosts } from '../api/posts'
 import { toggleLike } from '../api/likes'
+import { useSearchParams } from 'react-router-dom'
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState('for-you')
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
   const { user } = useAuth()
+  const [searchParams] = useSearchParams()
+  const activeTag = searchParams.get('tag')
 
   const fetchPosts = async () => {
     setLoading(true)
-    console.log('fetchPosts started')
+
     try {
-      const { data: postsData, error: postsError } = await supabase
+      let query = supabase
         .from('posts')
-        .select(`*, profiles(username, avatar_url), likes(user_id)`)
+        .select(`
+          *,
+          profiles(username, avatar_url),
+          likes(user_id),
+          post_tags(
+            tags(id, name, display_name)
+          )
+        `)
         .order('created_at', { ascending: false })
 
-      console.log('posts result:', { data: postsData, error: postsError })
+      const { data, error } = activeTag
+        ? await supabase
+            .from('post_tags')
+            .select(`
+              posts(
+                *,
+                profiles(username, avatar_url),
+                likes(user_id),
+                post_tags(
+                  tags(id, name, display_name)
+                )
+              ),
+              tags!inner(name)
+            `)
+            .eq('tags.name', activeTag)
+        : await query
 
-      if (postsError) throw postsError
+      if (error) throw error
 
-      const formatted = (postsData ?? []).map(post => ({
+      const postsData = activeTag
+        ? data.map(d => d.posts)
+        : data
+
+      const formatted = postsData.map(post => ({
         ...post,
+        tags: post.post_tags.map(pt => pt.tags),
         likes_count: (post.likes || []).length,
-        liked_by_user: (post.likes || []).some(like => like.user_id === user?.id)
+        liked_by_user: (post.likes || []).some(l => l.user_id === user?.id)
       }))
+
       setPosts(formatted)
+
     } catch (err) {
-      console.error('fetchPosts error:', err)
+      console.error(err)
     } finally {
       setLoading(false)
     }
@@ -43,20 +75,39 @@ export default function HomePage() {
 
   useEffect(() => {
     fetchPosts()
-  }, [activeTab])
+  }, [activeTab, activeTag])
 
-  const createPost = async (content) => {
+  const createPost = async (content, tags = []) => {
     if (!content || !user) return
 
-    const { error } = await supabase
+    // create post
+    const { data: post, error } = await supabase
       .from('posts')
       .insert([{ content, user_id: user.id }])
+      .select()
+      .single()
 
     if (error) {
-      console.error('Error creating post:', error.message)
-    } else {
-      fetchPosts()
+      console.error(error)
+      return
     }
+
+    // attach tags
+    if (tags.length > 0) {
+      const { data: tagRows } = await supabase
+        .from('tags')
+        .select('id, name')
+        .in('name', tags)
+
+      const inserts = tagRows.map(t => ({
+        post_id: post.id,
+        tag_id: t.id
+      }))
+
+      await supabase.from('post_tags').insert(inserts)
+    }
+
+    fetchPosts()
   }
 
   const likePost = async (postId) => {

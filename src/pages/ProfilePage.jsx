@@ -57,7 +57,10 @@ export default function ProfilePage() {
           setIsFollowing(following)
         }
 
-        const postsData = await getPostsByUser(profileData.user_id)
+        const postsData = await getPostsByUser(
+          profileData.user_id,
+          user?.id
+        )
         setPosts(postsData)
       }
     }

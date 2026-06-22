@@ -9,8 +9,8 @@ export default function MainLayout() {
       <Sidebar />
 
       {/* Main content area */}
-      <main className="flex-1 flex justify-center gap-8">
-        <div className="w-full max-w-2xl border-x min-h-screen"
+      <main className="flex-1 flex justify-center gap-8 !ml-64">
+        <div className="w-full max-w-3xl border-x min-h-screen"
           style={{ borderColor: 'var(--border)' }}>
           <Outlet />
         </div>
