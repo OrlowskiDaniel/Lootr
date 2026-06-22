@@ -18,6 +18,7 @@ export const getPostsByUser = async (userId, currentUserId) => {
       *,
       profiles(username, avatar_url),
       likes(user_id),
+      comments(count),
       post_tags(
         tags(id, name, display_name)
       )
@@ -35,6 +36,9 @@ export const getPostsByUser = async (userId, currentUserId) => {
 
     // likes
     likes_count: (post.likes || []).length,
+
+    // comment count
+    comments_count: post.comments?.[0]?.count ?? 0,
 
     liked_by_user: (post.likes || []).some(
       l => l.user_id === currentUserId

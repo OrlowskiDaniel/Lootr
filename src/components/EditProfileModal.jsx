@@ -31,30 +31,33 @@ export default function EditProfileModal({ profile, onClose, onSaved }) {
 
   return (
     <div className="fixed inset-0 z-[9999] bg-black/70 backdrop-blur-sm flex items-center justify-center">
-        <div className="lootr-card p-6 w-full max-w-md rounded-lg relative">
-        <h2 className="font-heading text-xl mb-4">Edit Profile</h2>
+        <div className="lootr-card !p-6 w-full max-w-md rounded-lg relative">
+        <h2 className="font-heading text-xl !mb-4">Edit Profile</h2>
 
         <input
-            className="lootr-input w-full p-2 mb-3 rounded"
+            className="lootr-input w-full !p-2 !mb-3 rounded"
             placeholder="Username"
             value={username}
             onChange={e => setUsername(e.target.value)}
         />
 
         <textarea
-            className="lootr-input w-full p-2 mb-3 rounded"
+            className="lootr-input w-full !p-2 !mb-3 rounded"
             placeholder="Description"
             value={description}
             onChange={e => setDescription(e.target.value)}
         />
 
-        <input type="file" onChange={e => setFile(e.target.files[0])} />
+        <p className="text-xs text-gray-400 group-hover:text-gray-200">
+          Click to upload an avatar
+        </p>
+        <input type="file" className='' onChange={e => setFile(e.target.files[0])} />
 
-        <div className="flex justify-end gap-2 mt-4">
-            <button className="btn-ghost px-3 py-1" onClick={onClose}>
+        <div className="flex justify-end !gap-2 !mt-4">
+            <button className="btn-ghost !px-3 !py-1" onClick={onClose}>
             Cancel
             </button>
-            <button className="btn-primary px-3 py-1" onClick={handleSave}>
+            <button className="btn-primary !px-3 p!y-1" onClick={handleSave}>
             Save
             </button>
         </div>

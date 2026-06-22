@@ -88,12 +88,14 @@ export default function PostCard({ post, onLike }) {
           </div>
 
           {/* Content */}
-          <p
-            className="mt-1.5 text-sm leading-relaxed"
-            style={{ color: 'var(--text-primary)' }}
-          >
-            {post.content}
-          </p>
+          <Link to={`/post/${post.id}`}>
+            <p
+              className="mt-1.5 text-sm leading-relaxed"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              {post.content}
+            </p>
+          </Link>
 
           {/* Like */}
           <div className="!mt-3">
@@ -114,6 +116,11 @@ export default function PostCard({ post, onLike }) {
               {post.likes_count ?? 0}
             </button>
           </div>
+          {post.comments_count > 0 && (
+            <div className="!mt-2 text-xs" style={{ color: 'var(--text-muted)' }}>
+              comments {post.comments_count}
+            </div>
+          )}
 
         </div>
       </div>

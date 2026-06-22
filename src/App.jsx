@@ -3,6 +3,7 @@ import MainLayout from './components/MainLayout'
 import AuthPage from './pages/AuthPage'
 import HomePage from './pages/HomePage'
 import ProfilePage from './pages/ProfilePage'
+import PostPage from './pages/PostPage'
 import { AuthProvider } from './hooks/useAuth'
 
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
           <Route element={<MainLayout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/profile/:username" element={<ProfilePage />} />
+            <Route path="/post/:id" element={<PostPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

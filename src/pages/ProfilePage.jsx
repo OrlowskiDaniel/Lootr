@@ -78,13 +78,13 @@ export default function ProfilePage() {
       <div className="h-32 w-full bg-gradient-to-r from-purple-900 to-black" />
 
       {/* Profile header */}
-      <div className="px-4 -mt-12">
+      <div className="!px-4 !-mt-12">
         <div className="flex justify-between items-start">
           <Avatar user={profile} size="xl" />
 
           {!isOwner && (
             <button
-                className="btn-primary px-4 py-1 mt-4"
+                className="btn-primary !px-4 !py-1 !mt-4"
                 onClick={async () => {
                   if (!user) return // Guard clause if user isn't logged in
 
@@ -101,7 +101,7 @@ export default function ProfilePage() {
 
           {isOwner && (
             <button
-              className="btn-ghost px-4 py-1 mt-4"
+              className="btn-ghost !px-4 !py-1 !mt-4"
               onClick={() => setEditing(true)}
             >
               Edit Profile
@@ -109,7 +109,7 @@ export default function ProfilePage() {
           )}
         </div>
 
-        <h2 className="font-heading text-2xl mt-2">
+        <h2 className="font-heading text-2xl !mt-2">
           {profile.username}
         </h2>
 
@@ -118,14 +118,14 @@ export default function ProfilePage() {
         </p>
 
         {/* stats (fake for now) */}
-        <div className="flex gap-4 mt-3 text-sm">
+        <div className="flex !gap-4 !mt-3 text-sm">
           <span><b>{posts.length}</b> Posts</span>
           <span><b>{followersCount}</b> Followers</span>
         </div>
       </div>
 
       {/* divider */}
-      <div className="neon-line my-4" />
+      <div className="neon-line !my-4" />
 
       {/* posts */}
       <div>
