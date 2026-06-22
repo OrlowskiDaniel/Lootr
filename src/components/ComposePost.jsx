@@ -38,9 +38,7 @@ export default function ComposePost({ onPost }) {
   }
 
   const handlePost = async () => {
-    if (!content.trim()) return
     setLoading(true)
-
     const tagNames = selectedTags.map(t => t.name)
     await onPost?.(content.trim(), tagNames)
 
