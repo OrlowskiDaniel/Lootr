@@ -28,6 +28,7 @@ export default function HomePage() {
           *,
           profiles(username, avatar_url),
           likes(user_id),
+          comments(count),
           post_tags(
             tags(id, name, display_name)
           )
@@ -42,6 +43,7 @@ export default function HomePage() {
                 *,
                 profiles(username, avatar_url),
                 likes(user_id),
+                comments(count),
                 post_tags(
                   tags(id, name, display_name)
                 )
@@ -61,7 +63,8 @@ export default function HomePage() {
         ...post,
         tags: post.post_tags.map(pt => pt.tags),
         likes_count: (post.likes || []).length,
-        liked_by_user: (post.likes || []).some(l => l.user_id === user?.id)
+        liked_by_user: (post.likes || []).some(l => l.user_id === user?.id),
+        comments_count: post.comments?.[0]?.count ?? 0
       }))
 
       setPosts(formatted)

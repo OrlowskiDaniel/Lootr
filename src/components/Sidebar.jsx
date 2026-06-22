@@ -105,19 +105,6 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Post Button */}
-      <div className="!px-4 !py-3 border-t" style={{ borderColor: 'var(--border)' }}>
-        <button
-          onClick={() => navigate('/')}
-          className="btn-primary w-full flex items-center justify-center !gap-2 !py-2.5 !px-4 rounded-lg cursor-pointer"
-        >
-          <Plus size={18} />
-          <span className="font-heading font-bold tracking-widest text-sm">
-            NEW LOOT
-          </span>
-        </button>
-      </div>
-
       {/* Auth Button */}
       <div className="!px-4 !py-3 border-t" style={{ borderColor: 'var(--border)' }}>
         {user ? (
