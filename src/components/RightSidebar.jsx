@@ -3,19 +3,14 @@ import { Search, TrendingUp, Zap } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { getTrendingTags, searchTags } from '../api/tags'
-
-const SUGGESTIONS = [
-  { username: 'NinjaStream', display_name: 'Ninja', followers: '24.2M', verified: true },
-  { username: 'ShroudFPS', display_name: 'Shroud', followers: '12.1M', verified: true },
-  { username: 'Pokimane', display_name: 'Pokimane', followers: '9.4M', verified: true },
-  { username: 'xQcOW', display_name: 'xQc', followers: '11.8M', verified: false },
-]
+import { getPopularUsers } from '../api/follows'
 
 export default function RightSidebar() {
   const [search, setSearch] = useState('')
   const [trending, setTrending] = useState([])
   const [results, setResults] = useState([])
   const navigate = useNavigate()
+  const [suggestions, setSuggestions] = useState([])
 
   // Fetch trending
   useEffect(() => {
@@ -41,8 +36,17 @@ export default function RightSidebar() {
     run()
   }, [search])
 
+  // Featch populair users
+  useEffect(() => {
+    const loadSuggestions = async () => {
+      const data = await getPopularUsers()
+      setSuggestions(data)
+    }
+
+    loadSuggestions()
+  }, [])
+
   return (
-    /* REMOVED: h-screen and overflow-y-auto */
     /* CHANGED: Kept sticky top-0 so it fixes in place naturally with the window scroll */
     <aside className="w-full flex-shrink-0 flex flex-col gap-8 sticky top-0 !py-6 !px-4 z-20">
 
@@ -110,26 +114,34 @@ export default function RightSidebar() {
           </h3>
         </div>
 
-        {SUGGESTIONS.map((person, i) => (
-          <div key={person.username}
+        {suggestions.map((person, i) => (
+          <div key={person.user_id}
             className="flex items-center gap-4 !px-5 !py-4 cursor-pointer transition-colors"
-            style={{ borderBottom: i < SUGGESTIONS.length - 1 ? '1px solid var(--border)' : 'none' }}
+            style={{ borderBottom: i < suggestions.length - 1 ? '1px solid var(--border)' : 'none' }}
             onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
             onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
           >
             {/* Avatar */}
-            <div className="avatar-ring w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
-              style={{ background: `hsl(${i * 80 + 260}, 60%, 25%)` }}>
-              <span className="font-heading font-bold text-sm" style={{ color: 'var(--light-purple)' }}>
-                {person.display_name[0]}
-              </span>
+            <div className="avatar-ring w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 select-none overflow-hidden"
+              style={{ background: person.avatar_url ? 'var(--dark-purple)' : `hsl(${i * 80 + 260}, 60%, 25%)` }}>
+              {person.avatar_url ? (
+                <img
+                  src={person.avatar_url}
+                  alt=""
+                  className="w-full h-full rounded-full object-cover"
+                />
+              ) : (
+                <span className="font-heading font-bold text-sm" style={{ color: 'var(--light-purple)' }}>
+                  {person.username?.[0]?.toUpperCase() ?? '?'}
+                </span>
+              )}
             </div>
 
             {/* Info */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center !gap-1">
                 <p className="font-heading font-semibold text-sm truncate" style={{ color: 'var(--white)' }}>
-                  {person.display_name}
+                  {person.username}
                 </p>
                 {person.verified && (
                   <span className="w-3.5 h-3.5 rounded-full flex-shrink-0 flex items-center justify-center"
@@ -141,7 +153,7 @@ export default function RightSidebar() {
                 )}
               </div>
               <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                {person.followers} followers
+                {person.followers.toLocaleString()} followers
               </p>
             </div>
 

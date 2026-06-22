@@ -7,7 +7,6 @@ import { useAuth } from '../hooks/useAuth'
 
 const NAV_ITEMS = [
   { to: '/', icon: Home, label: 'Home' },
-  { to: '/notifications', icon: Bell, label: 'Alerts', badge: 3 },
   { to: '/messages', icon: Mail, label: 'Messages' },
   { to: '/bookmarks', icon: Bookmark, label: 'Saved' },
   { to: '/profile', icon: User, label: 'Profile' },
