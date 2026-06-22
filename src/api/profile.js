@@ -70,3 +70,15 @@ export const getFollowersCount = async (userId) => {
 
   return count ?? 0
 }
+
+export const updateProfilePrivacy = async (userId, isPrivate) => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({ is_private: isPrivate })
+    .eq('user_id', userId)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
