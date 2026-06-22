@@ -9,6 +9,10 @@ import HomePage from './pages/HomePage'
 // (Double-check the path to where your AuthProvider is exported)
 import { AuthProvider } from './hooks/useAuth' 
 
+
+
+
+
 export default function App() {
   return (
     // 2. WRAP EVERYTHING INSIDE THE PROVIDER
