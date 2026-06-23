@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { Lock } from 'lucide-react'
 import Avatar from '../components/Avatar'
 import EditProfileModal from '../components/EditProfileModal'
 import PostCard from '../components/PostCard'
@@ -16,9 +17,12 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState(null)
   const [posts, setPosts] = useState([])
   const [editing, setEditing] = useState(false)
-
   const [isFollowing, setIsFollowing] = useState(false)
   const [followersCount, setFollowersCount] = useState(0)
+
+  const isOwner = user?.id === profile?.user_id
+  // only the owner can see it if it is private
+  const canViewProfile = !profile?.is_private || isOwner
 
   const likePost = async (postId) => {
     if (!user) return
@@ -57,11 +61,18 @@ export default function ProfilePage() {
           setIsFollowing(following)
         }
 
-        const postsData = await getPostsByUser(
-          profileData.user_id,
-          user?.id
-        )
-        setPosts(postsData)
+        // strictly private check for initial data load
+        const canView = !profileData.is_private || user?.id === profileData.user_id
+
+        if (canView) {
+          const postsData = await getPostsByUser(
+            profileData.user_id,
+            user?.id
+          )
+          setPosts(postsData)
+        } else {
+          setPosts([])
+        }
       }
     }
 
@@ -69,8 +80,6 @@ export default function ProfilePage() {
   }, [username, user]) 
 
   if (!profile) return <p className="p-4">Loading...</p>
-
-  const isOwner = user?.id === profile.user_id
 
   return (
     <div>
@@ -86,12 +95,11 @@ export default function ProfilePage() {
             <button
                 className="btn-primary !px-4 !py-1 !mt-4"
                 onClick={async () => {
-                  if (!user) return // Guard clause if user isn't logged in
+                  if (!user) return
 
                   const res = await toggleFollow(profile.user_id, user.id)
                   setIsFollowing(res.following)
                   
-                  // Dynamically increment or decrement the UI counter
                   setFollowersCount(prev => res.following ? prev + 1 : prev - 1)
                 }}
             >
@@ -117,7 +125,7 @@ export default function ProfilePage() {
           {profile.description}
         </p>
 
-        {/* stats (fake for now) */}
+        {/* stats */}
         <div className="flex !gap-4 !mt-3 text-sm">
           <span><b>{posts.length}</b> Posts</span>
           <span><b>{followersCount}</b> Followers</span>
@@ -129,7 +137,13 @@ export default function ProfilePage() {
 
       {/* posts */}
       <div>
-        {posts.length === 0 ? (
+        {!canViewProfile ? (
+          <div className="!p-6 text-center">
+            <p className="text-m flex items-center justify-center gap-2" style={{ color: 'var(--text-muted)' }}>
+              <Lock size={32} style={{ color: 'var(--purple)' }} className="shrink-0" /> This account is private.
+            </p>
+          </div>
+        ) : posts.length === 0 ? (
           <EmptyState title="No posts yet" />
         ) : (
           posts.map(post => (

@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabaseClient'
 
+
 // Shared data formatter to keep UI-ready shapes consistent
 export const formatPostData = (posts, userId) => {
   return (posts || [])
@@ -23,43 +24,6 @@ const POST_SELECT_QUERY = `
   comments(count),
   post_tags(tags(id, name, display_name))
 `
-
-export const fetchHomeFeed = async ({ activeTab, activeTag, userId }) => {
-  // Tag Feed Filter
-  if (activeTag) {
-    const { data, error } = await supabase
-      .from('post_tags')
-      .select(`posts(${POST_SELECT_QUERY}), tags!inner(name)`)
-      .eq('tags.name', activeTag)
-
-    if (error) throw error
-    return formatPostData(data?.map(d => d.posts), userId)
-  }
-
-  // Following Feed Filter
-  if (activeTab === 'following') {
-    if (!userId) return []
-    
-    const { data: follows, error: followError } = await supabase
-      .from('follows')
-      .select('following_id')
-      .eq('follower_id', userId)
-
-    if (followError) throw followError
-    const followingIds = follows.map(f => f.following_id)
-    if (followingIds.length === 0) return []
-
-    const { data, error } = await supabase
-      .from('posts')
-      .select(POST_SELECT_QUERY)
-      .in('user_id', followingIds)
-      .order('created_at', { ascending: false })
-
-    if (error) throw error
-    return formatPostData(data, userId)
-  }
-
-  // Default 
 
   const { data, error } = await supabase
     .from('posts')
