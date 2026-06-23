@@ -48,7 +48,7 @@ export default function ComposePost({ onPost }) {
   }
 
   return (
-    <div className="border-b p-4" style={{ borderColor: 'var(--border)' }}>
+    <div className="border-b !p-4" style={{ borderColor: 'var(--border)' }}>
       <div className="flex !gap-3">
         
         {/* Avatar */}
