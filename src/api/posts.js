@@ -32,7 +32,6 @@ const POST_SELECT_QUERY = `
 
   if (error) throw error
   return formatPostData(data, userId)
-}
 
 export const createNewPost = async (content, tags, userId) => {
   if (!content || !userId) return
