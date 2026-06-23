@@ -1,10 +1,11 @@
 import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../hooks/useAuth'
 import { getCommentsByPost, createComment } from '../api/comments'
+import { fetchPostById } from '../api/posts' 
 import PostCard from '../components/PostCard'
 import CommentCard from '../components/CommentCard'
+import { toggleLike } from '../api/likes'
 
 export default function PostPage() {
   const { id } = useParams()
@@ -16,44 +17,62 @@ export default function PostPage() {
 
   useEffect(() => {
     load()
-  }, [id])
+  }, [id, user?.id])
 
   const load = async () => {
-    // get post
-    const { data } = await supabase
-      .from('posts')
-      .select(`
-        *,
-        profiles(username, avatar_url),
-        likes(user_id)
-      `)
-      .eq('id', id)
-      .single()
+    try {
+      const postData = await fetchPostById(id, user?.id)
+      setPost(postData)
 
-    setPost({
-      ...data,
-      likes_count: data.likes.length
-    })
+      const commentsData = await getCommentsByPost(id)
+      setComments(commentsData)
+    } catch (err) {
+      console.error("Error loading post data:", err)
+    }
+  }
 
-    // get comments
-    const commentsData = await getCommentsByPost(id)
-    setComments(commentsData)
+  const likePost = async (postId) => {
+    if (!user) return
+
+    try {
+      // Tell Supabase to toggle the like and get back the true true/false status
+      const result = await toggleLike(postId, user.id)
+      const isLiked = result.liked
+
+      // Directly update our single post state based on what the server said
+      setPost(prevPost => {
+        if (!prevPost) return null
+        
+        return {
+          ...prevPost,
+          liked_by_user: isLiked,
+          likes_count: isLiked ? prevPost.likes_count + 1 : prevPost.likes_count - 1
+        }
+      })
+    } catch (err) {
+      console.error("Failed to toggle like:", err)
+    }
   }
 
   const handleComment = async () => {
     if (!text || !user) return
 
-    const newComment = await createComment(text, id, user.id)
-
-    setComments(prev => [...prev, newComment])
-    setText('')
+    try {
+      const newComment = await createComment(text, id, user.id)
+      setComments(prev => [...prev, newComment])
+      setText('')
+      
+      setPost(prev => prev ? { ...prev, comments_count: prev.comments_count + 1 } : null)
+    } catch (err) {
+      console.error("Failed to post comment:", err)
+    }
   }
 
-  if (!post) return <p>Loading...</p>
+  if (!post) return <p className="!p-4">Loading...</p>
 
   return (
     <div>
-      <PostCard post={post} />
+      <PostCard post={post} onLike={likePost} />
 
       {/* Comment box */}
       <div className="!p-4 border-b">
@@ -71,7 +90,7 @@ export default function PostPage() {
       {/* Comments */}
       <div>
         {comments.map(c => (
-            <CommentCard key={c.id} comment={c} />
+          <CommentCard key={c.id} comment={c} />
         ))}
       </div>
     </div>
