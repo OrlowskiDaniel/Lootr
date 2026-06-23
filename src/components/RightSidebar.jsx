@@ -4,11 +4,14 @@ import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { getTrendingTags, searchTags } from '../api/tags'
 import { getPopularUsers } from '../api/follows'
+import { searchUsers } from '../api/search'
+import { searchPosts } from '../api/search'
 
 export default function RightSidebar() {
   const [search, setSearch] = useState('')
   const [trending, setTrending] = useState([])
   const [results, setResults] = useState([])
+  const [mode, setMode] = useState(null) // 'tag' | 'user' | 'post'
   const navigate = useNavigate()
   const [suggestions, setSuggestions] = useState([])
 
@@ -22,19 +25,29 @@ export default function RightSidebar() {
   }, [])
 
   // Search logic
-  useEffect(() => {
-    const run = async () => {
-      if (!search) {
-        setResults([])
-        return
+  const handleSearch = async (e) => {
+    if (e.key !== 'Enter') return
+    if (!search) return
+
+    try {
+      // TAGS → stay in sidebar
+      if (search.startsWith('#')) {
+        const query = search.slice(1)
+        const data = await searchTags(query)
+        setResults(data)
+        setMode('tag')
+
+      } 
+      // USERS + POSTS → go to search page
+      else {
+        navigate(`/search?q=${search}`)
       }
 
-      const data = await searchTags(search)
-      setResults(data)
+    } catch (err) {
+      console.error(err)
     }
+  }
 
-    run()
-  }, [search])
 
   // Featch populair users
   useEffect(() => {
@@ -63,7 +76,8 @@ export default function RightSidebar() {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search Lootr..."
+          onKeyDown={handleSearch} // only search on Enter
+          placeholder="Search (#tag, @user, post)..."
           className="lootr-input w-full !pl-12 !pr-5 !py-4 rounded-full text-base"
         />
       </div>
@@ -78,7 +92,7 @@ export default function RightSidebar() {
           </h3>
         </div>
 
-        {(search ? results : trending).map((item, i) => (
+        {(mode === 'tag' ? results : trending).map((item, i) => (
           <div
             key={item.name}
             onClick={() => navigate(`/?tag=${item.name}`)}

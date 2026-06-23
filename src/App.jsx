@@ -6,6 +6,7 @@ import ProfilePage from './pages/ProfilePage'
 import PostPage from './pages/PostPage'
 import { AuthProvider } from './hooks/useAuth'
 import SettingsPage from './pages/SettingsPage'
+import SearchPage from './pages/SearchPage'
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
             <Route path="/profile/:username" element={<ProfilePage />} />
             <Route path="/post/:id" element={<PostPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/search" element={<SearchPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
