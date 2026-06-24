@@ -25,6 +25,7 @@ const POST_SELECT_QUERY = `
   post_tags(tags(id, name, display_name))
 `
 
+export const fetchHomeFeed = async ({ activeTab, activeTag, userId }) => {
   const { data, error } = await supabase
     .from('posts')
     .select(POST_SELECT_QUERY)
@@ -32,6 +33,7 @@ const POST_SELECT_QUERY = `
 
   if (error) throw error
   return formatPostData(data, userId)
+}
 
 export const createNewPost = async (content, tags, userId) => {
   if (!content || !userId) return
